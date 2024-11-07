@@ -31,7 +31,7 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
             <div className="w-full h-full flex">
                 < SidebarComp />
                 <div className="w-full h-full bg-gray-100 flex">
-                    <div className="w-4/6 h-full p-2">
+                    <div className="w-full h-full p-2">
                         < TableComp/>
                     </div>
                     <div className="w-2/6 h-full p-2">
