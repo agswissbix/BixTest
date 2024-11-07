@@ -12,6 +12,8 @@ import CardComp from "@/components/card";
 const Home: React.FC<ResponseProps> = ({ response }) => {
     const [openCards, setOpenCards] = useState<number[]>([]);
     const [closingCard, setClosingCard] = useState<number | null>(null);
+    const [isFullScreen, setIsFullscreen] = useState(false);
+
 
     const router = useRouter();
     console.log(response);
@@ -51,13 +53,37 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
                     <div className="w-full h-full p-2">
                         <TableComp onRowClick={handleRowClick} />
                     </div>
-                    <div className="absolute z-10 top-0 right-0 w-2/6 h-3/4 p-2 rounded-lg">
-                        <CardComp
-                            openCards={openCards}
-                            closingCard={closingCard}
-                            onCloseCard={handleCloseCard}
-                        />
-                    </div>
+                    {openCards.length > 0 ? (
+                        isFullScreen ? (
+                            <div className="absolute top-0 right-0 w-full h-3/4 p-2 rounded-lg">
+                                <CardComp
+                                    openCards={openCards}
+                                    closingCard={closingCard}
+                                    onCloseCard={handleCloseCard}
+                                    isFullScreen={isFullScreen}
+                                />
+                            </div>
+                        ) : (
+                            <div className="absolute top-0 right-0 w-2/6 h-3/4 p-2 rounded-lg">
+                                <CardComp
+                                    openCards={openCards}
+                                    closingCard={closingCard}
+                                    onCloseCard={handleCloseCard}
+                                    isFullScreen={isFullScreen}
+                                />
+                            </div>
+                        )
+                    ) : (
+                        <div className="hidden absolute top-0 right-0 w-2/6 h-3/4 p-2 rounded-lg">
+                            <CardComp
+                                openCards={openCards}
+                                closingCard={closingCard}
+                                onCloseCard={handleCloseCard}
+                                setIsFullScreen={setIsFullscreen}
+                            />
+                        </div>
+                    )}
+
                 </div>
             </div>
         </div>
