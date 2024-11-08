@@ -1,14 +1,22 @@
-import { CircleX } from 'lucide-react';
-import React, { useState } from 'react';
+import { CircleX, Maximize2, Minimize2 } from 'lucide-react';
+import { Toaster, toast } from 'sonner';
+import React from 'react';
 
 interface CardCompProps {
     openCards: number[];
     closingCard: number | null;
     onCloseCard: (id: number) => void;
-    setIsFullScreen: boolean;
+    fullscreenCard: number | null;
+    setFullscreenCard: (id: number | null) => void;
 }
 
-const CardComp: React.FC<CardCompProps> = ({ openCards, closingCard, onCloseCard, setIsFullScreen }) => {
+const CardComp: React.FC<CardCompProps> = ({
+                                               openCards,
+                                               closingCard,
+                                               onCloseCard,
+                                               fullscreenCard,
+                                               setFullscreenCard
+                                           }) => {
     const tablerows = [
         {
             id: 1,
@@ -27,49 +35,53 @@ const CardComp: React.FC<CardCompProps> = ({ openCards, closingCard, onCloseCard
         }
     ];
 
-
-    //definizione di una funzione per visualizzare la card a schermo intero
-    const setCardFullscreen = (id: string) => {
-        setIsFullScreen=true;
-        const card = document.getElementById(id);
-/*
-        if (card) {
-            card.classList.toggle('absolute');
-            card.classList.toggle('top-1/2');
-            card.classList.toggle('left-1/2');
-            card.classList.toggle('transform');
-            card.classList.toggle('-translate-x-1/2');
-            card.classList.toggle('-translate-y-1/2');
-        }
-        */
-
+    const toggleFullscreen = (id: number) => {
+        setFullscreenCard(fullscreenCard === id ? null : id);
+        toast.success('Toggle fullscreen')
     };
-
 
     return (
         <div className="relative w-full h-full flex justify-center items-end">
             {openCards.map((id, index) => {
                 const item = tablerows.find(d => d.id === id);
                 const isClosing = id === closingCard;
+                const isFullscreen = id === fullscreenCard;
 
                 return (
                     <div
-                        id={`card-${id}`}
                         key={id}
-                        className={`z-10 absolute top-0 bg-white rounded-lg shadow-xl transition-all duration-300 ease-out border border-gray-300 w-full h-full cursor-default ${isClosing ? 'transform translate-x-16 opacity-0' : ''}`}
+                        className={`
+                            z-10 absolute top-0 bg-white rounded-lg shadow-xl 
+                            transition-all duration-300 ease-out border border-gray-300 
+                            w-full h-full cursor-default 
+                            ${isClosing ? 'transform translate-x-16 opacity-0' : ''}    
+                        `}
                         style={{
-                            transform: `translateX(${index * -30}px) translateY(${index * 15}px) rotate(${index * -2}deg)`,
-                            zIndex: openCards.length - index,
+                            transform: !isFullscreen ? `translateX(${index * -30}px) translateY(${index * 15}px) rotate(${index * -2}deg)` : 'none',
+                            zIndex: isFullscreen ? 50 : openCards.length - index,
                         }}
                     >
                         <div className="p-6 relative">
-                            <div onClick={() => onCloseCard(id)}
-                                 className="static float-right cursor-pointer top-2 right-2 w-6 h-6 flex items-center justify-center transition-colors ">
-                                <CircleX className="w-4 h-4 text-red-500 hover:text-red-700"/>
+                            <div className="flex gap-2 float-right">
+                                <button
+                                    onClick={() => toggleFullscreen(id)}
+                                    className="cursor-pointer w-6 h-6 flex items-center justify-center transition-colors"
+                                >
+                                    {isFullscreen ? (
+                                        <Minimize2 className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                                    ) : (
+                                        <Maximize2 className="w-4 h-4 text-gray-500 hover:text-gray-700" />
+                                    )}
+                                </button>
+                                <button
+                                    onClick={() => onCloseCard(id)}
+                                    className="cursor-pointer w-6 h-6 flex items-center justify-center transition-colors"
+                                >
+                                    <CircleX className="w-4 h-4 text-red-500 hover:text-red-700" />
+                                </button>
                             </div>
                             <h3 className="text-xl font-bold text-gray-800">{item?.title}</h3>
                             <p className="text-gray-600 text-base mt-2">{item?.description}</p>
-                            <button onClick={() => setCardFullscreen(`card-${id}`) } className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">fullscreen</button>
                         </div>
                     </div>
                 );

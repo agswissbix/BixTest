@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import withAuth from '../utils/withAuth';
 import axiosInstance from '../utils/axios';
 import ResponseProps from '../utils/responseInterface';
@@ -8,15 +8,14 @@ import NavbarComp from "@/components/navbar";
 import SidebarComp from "@/components/sidebar";
 import TableComp from "@/components/table";
 import CardComp from "@/components/card";
+import {Toaster} from "sonner";
 
 const Home: React.FC<ResponseProps> = ({ response }) => {
     const [openCards, setOpenCards] = useState<number[]>([]);
     const [closingCard, setClosingCard] = useState<number | null>(null);
-    const [isFullScreen, setIsFullscreen] = useState(false);
-
+    const [fullscreenCard, setFullscreenCard] = useState<number | null>(null);
 
     const router = useRouter();
-    console.log(response);
 
     const handleLogout = async () => {
         try {
@@ -34,18 +33,19 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
     };
 
     const handleCloseCard = (id: number) => {
-        setClosingCard(id); // Imposta la card in chiusura
+        setClosingCard(id);
+        setFullscreenCard(null);
 
-        // Rimuove la card dopo l'animazione
         setTimeout(() => {
             setOpenCards(openCards.filter(openId => openId !== id));
-            setClosingCard(null); // Resetta lo stato della card in chiusura
-        }, 300); // Deve corrispondere alla durata della transizione in `CardComp`
+            setClosingCard(null);
+        }, 300);
     };
-
 
     return (
         <div className="w-screen h-screen">
+            <Toaster richColors position="bottom-right" />
+
             <NavbarComp />
             <div className="w-full h-full flex">
                 <SidebarComp />
@@ -53,37 +53,20 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
                     <div className="w-full h-full p-2">
                         <TableComp onRowClick={handleRowClick} />
                     </div>
-                    {openCards.length > 0 ? (
-                        isFullScreen ? (
-                            <div className="absolute top-0 right-0 w-full h-3/4 p-2 rounded-lg">
-                                <CardComp
-                                    openCards={openCards}
-                                    closingCard={closingCard}
-                                    onCloseCard={handleCloseCard}
-                                    isFullScreen={isFullScreen}
-                                />
-                            </div>
-                        ) : (
-                            <div className="absolute top-0 right-0 w-2/6 h-3/4 p-2 rounded-lg">
-                                <CardComp
-                                    openCards={openCards}
-                                    closingCard={closingCard}
-                                    onCloseCard={handleCloseCard}
-                                    isFullScreen={isFullScreen}
-                                />
-                            </div>
-                        )
-                    ) : (
-                        <div className="hidden absolute top-0 right-0 w-2/6 h-3/4 p-2 rounded-lg">
+                    {openCards.length > 0 && (
+                        <div
+                            className={`absolute top-0 right-0 p-2 rounded-lg transition-all duration-300
+                                ${fullscreenCard !== null ? 'w-full h-5/6' : 'w-2/6 h-3/4'}`}
+                        >
                             <CardComp
                                 openCards={openCards}
                                 closingCard={closingCard}
                                 onCloseCard={handleCloseCard}
-                                setIsFullScreen={setIsFullscreen}
+                                fullscreenCard={fullscreenCard}
+                                setFullscreenCard={setFullscreenCard}
                             />
                         </div>
                     )}
-
                 </div>
             </div>
         </div>
