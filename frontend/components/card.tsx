@@ -36,7 +36,17 @@ const CardComp: React.FC<CardCompProps> = ({
     ];
 
     const toggleFullscreen = (id: number) => {
-        setFullscreenCard(fullscreenCard === id ? null : id);
+
+        if (fullscreenCard) {
+            fullscreenCard = null;
+            setFullscreenCard(null);
+
+        }
+        else {
+            fullscreenCard = id;
+            setFullscreenCard(id);
+        }
+
         toast.success('Toggle fullscreen')
     };
 

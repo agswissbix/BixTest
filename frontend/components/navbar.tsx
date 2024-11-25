@@ -95,7 +95,7 @@ export default function NavbarComp() {
                                 <MenuItem>
                                     <a
                                         href="#"
-                                        className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100 data-[focus]:outline-none"
+                                        className="block px-4 py-2 text-sm text-gray-700 data-[fo+us]:bg-gray-100 data-[focus]:outline-none"
                                     >
                                         Settings
                                     </a>
