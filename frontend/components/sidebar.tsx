@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { Home, Package, Mail, ChevronDown, ChevronUp } from 'lucide-react';
+import LoadingComp from './loading';
+import $ from 'jquery';
+import ReactDOM from 'react-dom';
+
 
 const sidebarData = [
     {
@@ -27,7 +31,13 @@ const sidebarData = [
     }
 ];
 
-const TableComp = () => {
+
+interface SidebarProps {
+    onChangeComponent: (component: string) => void;
+}
+
+
+const TableComp: React.FC<SidebarProps> = ({ onChangeComponent }) => {
     const [openDropdown, setOpenDropdown] = useState('');
     const [activeTooltip, setActiveTooltip] = useState(null);
 
@@ -38,6 +48,10 @@ const TableComp = () => {
     const handleMouseLeave = () => {
         setActiveTooltip(null);
     };
+
+    const loadSettings = () => {
+
+    }
 
     return (
         <div className="bg-gray-800 text-white h-screen
@@ -107,7 +121,7 @@ const TableComp = () => {
                                                 <a
                                                     href={subItem.href}
                                                     className="block px-12 py-2 hover:bg-gray-700 transition-colors"
-                                                >
+                                                    onClick={() => onChangeComponent('SettingsComp')}                                              >
                                                     {subItem.title}
                                                 </a>
                                             </li>
