@@ -1,6 +1,5 @@
 import React from "react";
 import { Settings } from 'lucide-react';
-import { Checkbox } from "@material-tailwind/react";
 
 
 interface Table {
