@@ -16,7 +16,7 @@ const withAuth = (WrappedComponent: NextPage, url: string) => {
     useEffect(() => {
       const fetchData = async () => {
         try {
-          const response = await axiosInstance.post(url + '/', {data: "Some data"});
+          const response = await axiosInstance.post('auth/' + url + '/', {data: "Some data"});
           setAuthorized(true);
           setResponse(response.data);
 

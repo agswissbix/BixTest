@@ -5,7 +5,7 @@ import Router from 'next/router';
 
 // Crea un'istanza axios preconfigurata
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8000/api/auth/', // Base URL del backend Django
+    baseURL: 'http://localhost:8000/api/', // Base URL del backend Django
     withCredentials: true, // Invia automaticamente i cookie di sessione con ogni richiesta
 });
 

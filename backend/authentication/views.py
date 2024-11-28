@@ -5,6 +5,8 @@ from django.middleware.csrf import get_token
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
+#import time
+
 
 @csrf_exempt
 def login_view(request):
@@ -57,3 +59,11 @@ def home_view(request):
     received_token =  request.headers.get('X-CSRFToken')
     print('received_token: '+received_token)
     return JsonResponse({"message": "You have access to this protected resource"})
+
+@login_required
+def test_request(request):
+    #time.sleep(1)
+    return JsonResponse({"message": "You have access to this protected resource"})
+
+
+

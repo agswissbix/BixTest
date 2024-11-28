@@ -121,7 +121,7 @@ const TableComp: React.FC<SidebarProps> = ({ onChangeComponent }) => {
                                                 <a
                                                     href={subItem.href}
                                                     className="block px-12 py-2 hover:bg-gray-700 transition-colors"
-                                                    onClick={() => onChangeComponent('SettingsComp')}                                              >
+                                                    onClick={() => onChangeComponent('SettingsPage')}                                              >
                                                     {subItem.title}
                                                 </a>
                                             </li>
