@@ -10,7 +10,13 @@ import TableComp from "@/components/table";
 import CardComp from "@/components/card";
 import {Toaster} from "sonner";
 import LoadingComp from "@/components/loading";
-import SettingsComp from "@/components/settings";
+import dynamic from 'next/dynamic';
+
+
+const SettingsPage = dynamic(() => import("@/pages/settings"), {
+    suspense: true,
+    loading: () => <LoadingComp /> // Aggiungi questo
+});
 
 const Home: React.FC<ResponseProps> = ({ response }) => {
     const [openCards, setOpenCards] = useState<number[]>([]);
@@ -19,8 +25,13 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
     const [currentComponent, setCurrentComponent] = useState<string>('');
 
     // Funzione per cambiare il componente da caricare
-    const handleComponentChange = (component: string) => {
-        setCurrentComponent(component);
+    const handleComponentChange = async (component: string) => {
+        try {
+            await axiosInstance.post('auth/test_request/');
+            setCurrentComponent(component);
+        } catch (error) {
+            console.error('Errore durante il logout', error);
+        }
     };
 
     const router = useRouter();
@@ -59,12 +70,10 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
             <div className="w-full h-full flex">
                 <SidebarComp onChangeComponent={handleComponentChange} />
                 <div className=" relative w-full h-full bg-gray-100">
-                    <Suspense fallback={<LoadingComp />}>
-                        <div className="home-content">
-                            {currentComponent === 'SettingsComp' && <SettingsComp />}
-                        </div>
+                    <Suspense>
+                        {currentComponent === 'SettingsPage' && <SettingsPage />}
                     </Suspense>
-
+                    {/*}
                     <div className="w-full h-full p-2">
                         <TableComp onRowClick={handleRowClick} />
                     </div>
@@ -81,6 +90,7 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
                             />
                         </div>
                     )}
+                    {*/}
                 </div>
             </div>
         </div>

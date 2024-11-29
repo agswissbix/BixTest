@@ -13,7 +13,7 @@ const Login = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await axiosInstance.post('login/', { username, password });
+            await axiosInstance.post('auth/login/', { username, password });
             router.push('home'); // Reindirizza alla home dopo un login corretto
         } catch (error) {
             alert('Credenziali sbagliate');

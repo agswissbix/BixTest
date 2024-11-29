@@ -19,4 +19,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('api/auth/', include('authentication.urls')),
+    path('api/settings/', include('bix_settings.urls')),
 ]

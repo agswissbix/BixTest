@@ -1,6 +1,6 @@
 # authentication/urls.py
 from django.urls import path
-from .views import login_view, logout_view, home_view
+from .views import login_view, logout_view, home_view, test_request
 from .views import csrf_token_view
 
 urlpatterns = [
@@ -8,4 +8,5 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('home/', home_view, name='home'),
     path('csrf-token/', csrf_token_view, name='csrf_token'),
+    path('test_request/', test_request, name='test_request'),
 ]
