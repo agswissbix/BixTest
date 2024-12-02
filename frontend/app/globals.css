@@ -33,3 +33,16 @@ input {
   padding: 12px 20px;
 }
 
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #dadada;
+  border-radius: 20px;
+}
+

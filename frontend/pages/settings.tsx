@@ -6,12 +6,14 @@ import { Suspense } from 'react';
 import LoadingComp from "@/components/loading";
 import axiosInstance from "@/utils/axios";
 import dynamic from "next/dynamic";
+import TableSettings from '@/components/settings/table/tableSettings';
+import FieldSettings from '@/components/settings/table/fieldSettings';
 
-const TablesList = dynamic(() => import("@/components/settings/tablesList"), {
+const TablesList = dynamic(() => import("@/components/settings/table/tablesList"), {
     suspense: true,
     loading: () => <LoadingComp /> // Aggiungi questo
 });
-
+    
 const SettingsPage: React.FC = () => {
 
     const [usersList, setUsersList] = useState([]);
@@ -62,8 +64,12 @@ const SettingsPage: React.FC = () => {
             <div className="w-1/5 h-full p-2.5">
                 <TablesList workspaces={workspacesTables} />
             </div>
-            <div className="w-1/5 h-full p-2.5"></div>
-            <div className="w-1/5 h-full p-2.5"></div>
+            <div className="w-1/5 h-full p-2.5">
+                <TableSettings />
+            </div>
+            <div className="w-1/5 h-full p-2.5">
+                <FieldSettings />
+            </div>
             <div className="w-1/5 h-full p-2.5"></div>
         </div>
     );

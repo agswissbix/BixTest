@@ -95,6 +95,14 @@ const TableComp: React.FC<SidebarProps> = ({ onChangeComponent }) => {
                                             {item.title}
                                         </div>
                                         <ul className="py-1">
+                                            <li>
+                                                <a
+                                                    href="#"
+                                                    className="block px-4 py-2 hover:bg-gray-600 transition-colors"
+                                                >
+                                                    Tabella
+                                                </a>
+                                            </li>
                                             {item.subItems.map((subItem) => (
                                                 <li key={subItem.id}>
                                                     <a
@@ -116,6 +124,15 @@ const TableComp: React.FC<SidebarProps> = ({ onChangeComponent }) => {
                                     }`}
                                 >
                                     <ul className="bg-gray-900 py-2">
+                                        <li>
+                                            <a
+                                                href="#"
+                                                className="block px-12 py-2 hover:bg-gray-700 transition-colors"
+                                                onClick={() => onChangeComponent('TableCardManager')}
+                                            >
+                                                Tabella
+                                            </a>
+                                        </li>
                                         {item.subItems.map((subItem) => (
                                             <li key={subItem.id}>
                                                 <a
