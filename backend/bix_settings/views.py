@@ -39,5 +39,7 @@ def get_workspaces_tables(request):
                 if table['workspace'] == workspace['name']:
                     workspace['tables'].append(table)
 
-
     return JsonResponse({"workspaces": workspaces})
+
+
+

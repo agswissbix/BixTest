@@ -8,6 +8,7 @@ import axiosInstance from "@/utils/axios";
 import dynamic from "next/dynamic";
 import TableSettings from '@/components/settings/table/tableSettings';
 import FieldSettings from '@/components/settings/table/fieldSettings';
+import TestTablesList from '@/components/settings/table/testTableList';
 
 const TablesList = dynamic(() => import("@/components/settings/table/tablesList"), {
     suspense: true,
@@ -57,12 +58,12 @@ const SettingsPage: React.FC = () => {
                 <Select
                     name="select-user"
                     options={usersList}
-                    value={selectedValue}
+                    value={selectedValue}   
                     onChange={handleUserChange}
                 />
             </div>
             <div className="w-1/5 h-full p-2.5">
-                <TablesList workspaces={workspacesTables} />
+                <TestTablesList workspaces={workspacesTables} />
             </div>
             <div className="w-1/5 h-full p-2.5">
                 <TableSettings />

@@ -1,5 +1,6 @@
 import React from "react";
 import { Settings } from 'lucide-react';
+import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 
 interface Table {
@@ -34,7 +35,7 @@ const TablesList: React.FC<Workspaces> = ({ workspaces = [] }) => {
                                         </div>
                                         <div className="w-9/12 h-full p-1">
                                             <span>{table.name}</span>
-
+                                        
                                         </div>
                                         <div className="w-2/12 h-full flex items-center justify-end space-x-2">
                                             <button type="button"
@@ -47,6 +48,7 @@ const TablesList: React.FC<Workspaces> = ({ workspaces = [] }) => {
                 </div>
             ))}
         </div>
+        
     );
 };
 

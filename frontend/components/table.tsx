@@ -1,60 +1,56 @@
+import React, {useState} from 'react';
+import axiosInstance from "@/utils/axios";
+import { useEffect } from 'react';
+
 interface TableCompProps {
-    onRowClick: (id: number) => void;  // Funzione per gestire il clic sulla riga
+    tableid : string;
+    onRowClick: (recordid: string) => void;  // Funzione per gestire il clic sulla riga
 }
 
-const tablerows = [
-    {
-        id: 1,
-        productname: "Apple MacBook Pro 17",
-        color: "Silver",
-        category: "Laptop",
-        price: "$2999"
-    },
-    {
-        id: 2,
-        productname: "Microsoft Surface Pro",
-        color: "White",
-        category: "Laptop PC",
-        price: "$1999"
-    },
-    {
-        id: 3,
-        productname: "Magic Mouse 2",
-        color: "Black",
-        category: "Accessories",
-        price: "$99"
-    }
-];
 
-const TableComp: React.FC<TableCompProps> = ({ onRowClick }) => {
+const TableComp: React.FC<TableCompProps> = ({ onRowClick, tableid }) => {
+    const [tableRows, setTableRows] = useState([]);
+
+    const getTableData = async () => {
+        try {
+            const response = await axiosInstance.post('records/get_table_data/', {tableid: tableid});
+            console.log(response.data);
+            setTableRows(response.data.table_rows);
+        } catch (error) {
+            console.error('Errore durante il caricamento dei dati', error);
+        }
+    }
+
+    useEffect(() => {
+        getTableData();
+    }, []);
+
     return (
-        <div className="relative overflow-x-auto rounded-lg">
-            <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    <th scope="col" className="px-6 py-3">Product name</th>
-                    <th scope="col" className="px-6 py-3">Color</th>
-                    <th scope="col" className="px-6 py-3">Category</th>
-                    <th scope="col" className="px-6 py-3">Price</th>
-                </tr>
-                </thead>
-                <tbody>
-                {tablerows.map((row) => (
-                    <tr
-                        key={row.id}
-                        className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
-                        onClick={() => onRowClick(row.id)}  // Passa l'ID della riga selezionata
-                    >
-                        <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            {row.productname}
-                        </th>
-                        <td className="px-6 py-4">{row.color}</td>
-                        <td className="px-6 py-4">{row.category}</td>
-                        <td className="px-6 py-4">{row.price}</td>
-                    </tr>
-                ))}
-                </tbody>
-            </table>
+        <div className="w-full h-5/6">
+            <div className="relative h-full w-full overflow-auto rounded-lg">
+                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 overflow-hidden">
+                    <thead className="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 overflow-hidden">
+                        <tr>
+                            <th className="px-6 py-3">ID</th>
+                        </tr>
+                    </thead>
+                    <tbody className="overflow-x-hidden">
+                        {tableRows.map((row) => (
+                            <tr
+                                key={row.recordid_}
+                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
+                                onClick={() => onRowClick(row.recordid_)}
+                            >
+                                {Object.keys(row).map((field, index) => (
+                                    <td key={index} className="px-6 py-3 whitespace-nowrap dark:text-white">
+                                        {row[field]}
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 };
