@@ -23,6 +23,8 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
 
     // Funzione per cambiare il componente da caricare
     const handleComponentChange = async (componentType: string, tableid: string) => {
+        setCurrentComponent('');
+        setTableid('');
         try {
             await axiosInstance.post('auth/test_request/');
 
@@ -60,7 +62,7 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
             <NavbarComp />
             <div className="w-full h-full flex">
                 <SidebarComp onChangeComponent={handleComponentChange} />
-                <div className=" relative w-full h-full bg-gray-100">
+                <div className="relative w-full h-full bg-gray-100">
                     <Suspense>
                         {currentComponent === 'SettingsPage' && <SettingsPage />}
                         {currentComponent === 'TableCardManager' && <TableCardManager tableid={tableid} />}

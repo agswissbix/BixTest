@@ -1,12 +1,19 @@
 import React from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 import { useEffect } from "react";
-import { Settings } from 'lucide-react';
+import { Settings, Save } from 'lucide-react';
+import { useSettingsStore } from '@/stores/settingsStore';
+import TableSettings from './tableSettings';
+import axiosInstance from "@/utils/axios";
+import { Toaster, toast } from 'sonner';
+
+
 
 interface Table {
     id: string;
     name: string;
-    workspaceorder: number;
+    tableorder: number | null;
+    isVisible: boolean;
 }
 
 interface Workspace {
@@ -23,7 +30,16 @@ interface Workspaces {
 
 const TestTablesList: React.FC<Workspaces> = ({ workspaces = [] }) => {
 
+    const {setTableid, resetTableid} = useSettingsStore();
 
+    const {setTableSettings, resetTableSettings} = useSettingsStore()
+
+    const {userid} = useSettingsStore();
+    
+
+    const getTableSettings = () => {
+        setTableSettings(<TableSettings />);  // Imposta TableSettings come componente attivo
+      };
     
     const onDragEnd = (result: any) => {
 
@@ -67,27 +83,64 @@ const TestTablesList: React.FC<Workspaces> = ({ workspaces = [] }) => {
             destWorkspace.tables = newDestTables;
             sourceWorkspace.tables = newSourceTables;
         }
+
+        // Aggiorna il campo tableorder in base al nuovo ordine
+        sourceWorkspace.tables.forEach((table, index) => {
+            table.tableorder = index;
+        });
+
+        if (sourceWorkspace.id !== destWorkspace.id) {
+            destWorkspace.tables.forEach((table, index) => {
+                table.tableorder = index;
+            });
+        }
+
+        console.info(workspaces);
     };
 
-    const saveTablesOrder = async () => {
-        /*
-        let count = 0
-        workspaces.forEach(workspace=> {
-            workspace.tables.forEach((table) => {
-                table.workspaceorder = count;
-                count++;
-  
-            });
-        });
-        console.info(workspaces);
-        */
 
+    const handleVisibilityChange = (tableid : string, checked : boolean) => {
+        if (checked == true) {
+            workspaces.map((workspace) => (
+                workspace.tables.map((table) => {
+                    if (table.id === tableid) {
+                        table.isVisible = false;
+                        table.tableorder = null;
+                    }
+                })
+            ))
+        }
+        else {
+            workspaces.map((workspace) => (
+                workspace.tables.map((table) => {
+                    if (table.id === tableid) {
+                        table.isVisible = true;
+                        table.tableorder = workspace.tables.indexOf(table);
+                        }
+                })
+            ))
+        }
     }
 
+    const saveTablesOrder = async () => {
+        try {
+            const response = await axiosInstance.post('settings/save_tables_order/', {workspaces: workspaces, userid: userid});
+            toast.success('Ordine delle tabelle salvato con successo');
+
+        } catch (error) {
+            console.error('Errore durante il salvataggio dell\'ordine delle tabelle', error);
+        }
+    }
+
+    useEffect (() => {
+        resetTableid();
+        return () => {
+            resetTableSettings();
+        }
+    }, []);
 
     return (
         <DragDropContext onDragEnd={onDragEnd}>
-            <button onClick={saveTablesOrder}>save</button>
             <div className="top-0  w-full h-5/6 cursor-default overflow-auto">
                         {workspaces.map((workspace, index) => (
                             <div className="z-10 top-0 bg-gray-50 rounded-lg shadow-md  border border-gray-300 w-full cursor-default overflow-auto mx-auto p-2.5 mb-3 mt-3">
@@ -115,19 +168,16 @@ const TestTablesList: React.FC<Workspaces> = ({ workspaces = [] }) => {
                                                             {...provided.dragHandleProps}
                                                             className="z-10 top-0 bg-white rounded-lg shadow-md border border-gray-300 w-full cursor-default overflow-auto mx-auto p-2.5 mb-2 mt-2 flex items-center justify-between"
                                                         >
-                                                                <div className="w-1/12 h-full p-1">
+                                                                <div className="w-2/12 h-full p-1">
 
-                                                                {/*USARE SWITCH*/}
-                                                                <input id="default-checkbox" type="checkbox" value="" checked={table.workspaceorder !== null} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600  "/>
-                                                                {/*USARE SWITCH*/}
+                                                                <input onClick={() => {handleVisibilityChange(table.id, table.isVisible)}} id="default-checkbox" type="checkbox" value="" defaultChecked={table.isVisible !== false} className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600  "/>
 
                                                                 </div>
-                                                                <div className="w-9/12 h-full p-1">
+                                                                <div className="w-8/12 h-full p-1">
                                                                     <span>{table.name}</span>
                                                                 </div>
                                                                 <div className="w-2/12 h-full flex items-center justify-end space-x-2">
-                                                                    <button type="button"
-                                                                            className="rounded-full text-gray-600 hover:text-gray-400 focus:text-gray-400">
+                                                                    <button type="button"className="rounded-full text-gray-600 hover:text-gray-400 focus:text-gray-400"onClick={() => {getTableSettings();setTableid(table.id)}}>
                                                                         <Settings/>
                                                                     </button>
                                                                 </div>
@@ -142,6 +192,8 @@ const TestTablesList: React.FC<Workspaces> = ({ workspaces = [] }) => {
                             </div>
                         ))}
                     </div>
+                    <button className="flex w-min-content float-right mt-2 rounded-md bg-blue-700 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-bixcolor-default" onClick={saveTablesOrder}><Save /></button>
+
         </DragDropContext>
     );
 };

@@ -28,28 +28,28 @@ const TableComp: React.FC<TableCompProps> = ({ onRowClick, tableid }) => {
     return (
         <div className="w-full h-5/6">
             <div className="relative h-full w-full overflow-auto rounded-lg">
-                <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 overflow-hidden">
-                    <thead className="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 overflow-hidden">
-                        <tr>
-                            <th className="px-6 py-3">ID</th>
-                        </tr>
-                    </thead>
-                    <tbody className="overflow-x-hidden">
-                        {tableRows.map((row) => (
-                            <tr
-                                key={row.recordid_}
-                                className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
-                                onClick={() => onRowClick(row.recordid_)}
-                            >
-                                {Object.keys(row).map((field, index) => (
-                                    <td key={index} className="px-6 py-3 whitespace-nowrap dark:text-white">
-                                        {row[field]}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+            <table className="text-sm text-left text-gray-500 dark:text-gray-400 w-full">
+                <thead className="sticky top-0 text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th className="px-6 py-3">ID</th>
+                </tr>
+                </thead>
+                <tbody>
+                {tableRows.map((row) => (
+                    <tr
+                    key={row.recordid_}
+                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 cursor-pointer"
+                    onClick={() => onRowClick(row.recordid_)}
+                    >
+                    {Object.keys(row).map((field, index) => (
+                        <td key={index} className="px-6 py-3 whitespace-nowrap dark:text-white">
+                        {row[field]}
+                        </td>
+                    ))}
+                    </tr>
+                ))}
+                </tbody>
+            </table>
             </div>
         </div>
     );
