@@ -18,6 +18,16 @@ interface SettingsStore {
     fieldSettings : React.ReactNode | null;
     setFieldSettings: (component: React.ReactNode | null) => void;
     resetFieldSettings: () => void;
+
+    fieldOptions: React.ReactNode | null;
+    setFieldOptions: (component: React.ReactNode | null) => void;
+    resetFieldOptions: () => void;
+
+    containerMultiUse: React.ReactNode | null;
+    setContainerMultiUse: (component: React.ReactNode | null) => void;
+    resetContainerMultiUse: () => void;
+
+    
 }
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
@@ -37,5 +47,14 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
     fieldSettings: null,
     setFieldSettings: (component: React.ReactNode | null) => set({ fieldSettings: component }),
     resetFieldSettings: () => set({ fieldSettings: null }),
+
+    fieldOptions: null,
+    setFieldOptions: (component: React.ReactNode | null) => set({ fieldOptions: component }),
+    resetFieldOptions: () => set({ fieldOptions: null }),
+
+    containerMultiUse: null,
+    setContainerMultiUse: (component: React.ReactNode | null) => set({ containerMultiUse: component }),
+    resetContainerMultiUse: () => set({ containerMultiUse: null }),
+
 
 }));

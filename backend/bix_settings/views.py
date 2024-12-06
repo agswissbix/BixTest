@@ -76,4 +76,154 @@ def get_table_fields(request):
     return JsonResponse({"fields": fields})
 
 
+def get_field_options(request):
+    data = json.loads(request.body)
+    fieldid = data['fieldid']
+
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT optionid, description FROM sys_option WHERE fieldid = %s", [fieldid])
+        options = dictfetchall(cursor)
+
+    return JsonResponse({"options": options})
+
+
+def save_new_table_field(request):
+    data = json.loads(request.body)
+
+    tableid = data['tableid']
+    fieldid = data['fieldid']
+    fielddescription = data['fielddescription']
+    fieldtype = data['fieldtype']
+
+    with connection.cursor() as cursor:
+        cursor.execute(
+            "SELECT * FROM sys_field WHERE tableid= %s AND fieldid= %s", [tableid, fieldid]
+        )
+        row = dictfetchall(cursor)
+
+        if not row:
+
+            if fieldtype != 'Linked' and fieldtype != 'LongText':
+                if fieldtype == 'Categoria':
+                    cursor.execute(
+                        "INSERT INTO sys_field (tableid, fieldid, description, lookuptableid, fieldtypeid, length, label) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                        [tableid, fieldid, fielddescription, fieldid + '_' + tableid, 'Parola', 255, 'Dati']
+                    )
+                if fieldtype == 'Checkbox':
+                    cursor.execute(
+                        "INSERT INTO sys_field (tableid, fieldid, description, lookuptableid, fieldtypeid, length, label, fieldtypewebid) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                        [tableid, fieldid, fielddescription, fieldid + '_' + tableid, 'Parola', 255, 'Dati', 'checkbox']
+                    )
+
+                elif fieldtype in [ 'Numero', 'Parola', 'Memo', 'Utente']:
+                    cursor.execute(
+                        "INSERT INTO sys_field (tableid, fieldid, description, fieldtypeid, length, label) VALUES (%s, %s, %s, %s, %s, %s)",
+                        [tableid, fieldid, fielddescription, fieldtype, 255, 'Dati']
+                    )
+
+                sql = f"ALTER TABLE user_{tableid} ADD COLUMN {fieldid} VARCHAR(255) NULL"
+
+                if fieldtype == 'Data':
+                    cursor.execute(
+                        "INSERT INTO sys_field (tableid, fieldid, description, fieldtypeid, length, label) VALUES (%s, %s, %s, %s, %s, %s)",
+                        [tableid, fieldid, fielddescription, 'Data', 255, 'Dati']
+                    )
+
+                    sql = f"ALTER TABLE user_{tableid} ADD COLUMN {fieldid} DATE NULL"
+
+
+                cursor.execute(sql)
+
+                if fieldtype == 'Categoria':
+
+                    cursor.execute(
+                        "INSERT INTO sys_lookup_table (description, tableid, itemtype, codelen, desclen) VALUES (%s, %s, %s, %s, %s)",
+                        [fieldid, fieldid + '_' + tableid, 'Carattere', 255, 255]
+                    )
+
+                    values = data['valuesArray']
+
+                    for value in values:
+                        id = value['id']
+                        description = value['description']
+
+                        cursor.execute(
+                            "INSERT INTO sys_lookup_table_item (lookuptableid, itemcode, itemdesc) VALUES (%s, %s, %s)",
+                            [fieldid + '_' + tableid, description, description]
+                        )
+                    
+                if fieldtype == 'Checkbox':
+                    
+                    cursor.execute(
+                        "INSERT INTO sys_lookup_table (description, tableid, itemtype, codelen, desclen) VALUES (%s, %s, %s, %s, %s)",
+                        [fieldid, fieldid + '_' + tableid, 'Carattere', 255, 255]
+                    )
+
+                    cursor.execute(
+                        "INSERT INTO sys_lookup_table_item (lookuptableid, itemcode, itemdesc) VALUES (%s, %s, %s)",
+                        [fieldid + '_' + tableid, 'Si', 'Si']
+                    )
+
+                    cursor.execute(
+                        "INSERT INTO sys_lookup_table_item (lookuptableid, itemcode, itemdesc) VALUES (%s, %s, %s)",
+                        [fieldid + '_' + tableid, 'No', 'No']
+                    )
+
+            elif fieldtype == 'LongText':
+
+
+                cursor.execute(
+                    "INSERT INTO sys_field (tableid, fieldid, description, fieldtypeid, length, label, fieldtypewebid) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                    [tableid, fieldid, fielddescription, 'Memo', 4294967295, 'Dati', 'html']
+                )
+
+                sql = f"ALTER TABLE user_{tableid} ADD COLUMN {fieldid} LONGTEXT NULL"
+
+                cursor.execute(sql)
+
+
+            else:
+
+                linkedtableid = data['linkedtable']
+                newcolumn = 'recordid' + linkedtableid + '_'
+                newcolumn2 = '_recordid' + linkedtableid
+
+                fieldid2 = 'recordid' + tableid + '_'
+
+                fields = data['linkedtablefields']
+                keyfieldlink = ''
+
+                for field in fields:
+                    keyfieldlink += field + ','
+
+                keyfieldlink = keyfieldlink[:-1]
+
+                sql = f"ALTER TABLE user_{tableid} ADD COLUMN {newcolumn} VARCHAR(255) NULL"
+
+                sql2 = f"INSERT INTO sys_field (tableid, fieldid, description, fieldtypeid, length, label, keyfieldlink, tablelink) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                params2 = [tableid, newcolumn, fielddescription, 'Parola', 255, linkedtableid, keyfieldlink,
+                           linkedtableid]
+
+                sql3 = f"INSERT INTO sys_field (tableid, fieldid, description, fieldtypeid, length, label, keyfieldlink, tablelink) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                params3 = [linkedtableid, fieldid2, fielddescription, 'Parola', 255, tableid, keyfieldlink, tableid]
+
+                sql4 = f"INSERT INTO sys_table_link (tableid, tablelinkid) VALUES (%s, %s)"
+                params4 = [linkedtableid, tableid]
+
+                sql5 = f"ALTER TABLE user_{tableid} ADD COLUMN {newcolumn2} VARCHAR(255) NULL"
+
+                sql6 = f"INSERT INTO sys_field (tableid, fieldid, description, fieldtypeid, length, label, keyfieldlink, tablelink) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+                params6 = [tableid, newcolumn2, fielddescription, 'Parola', 255, 'Dati', keyfieldlink, linkedtableid]
+
+                with connection.cursor() as cursor:
+                    cursor.execute(sql)
+                    cursor.execute(sql2, params2)
+                    cursor.execute(sql3, params3)
+                    cursor.execute(sql4, params4)
+                    cursor.execute(sql5)
+                    cursor.execute(sql6, params6)
+
+    return JsonResponse({'success': True})
+
+
 

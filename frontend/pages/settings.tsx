@@ -25,6 +25,8 @@ const SettingsPage: React.FC = () => {
     const {fieldSettings} = useSettingsStore();
     const {resetFieldSettings} = useSettingsStore();
 
+    const {containerMultiUse} = useSettingsStore();
+
     const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const selectedUser = e.target.value;
         try {
@@ -86,7 +88,9 @@ const SettingsPage: React.FC = () => {
             <div className="w-1/5 h-full p-2.5">
                 {fieldSettings}
             </div>
-            <div className="w-1/5 h-full p-2.5"></div>
+            <div className="w-1/5 h-full p-2.5">
+
+            </div>
         </div>
     );
 };

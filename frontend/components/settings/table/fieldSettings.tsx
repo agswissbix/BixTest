@@ -3,6 +3,12 @@ import { Settings } from 'lucide-react';
 import { DragDropContext } from '@hello-pangea/dnd';
 import { Droppable } from '@hello-pangea/dnd';
 import { Draggable } from '@hello-pangea/dnd';
+import { useEffect, useState } from 'react';
+import { useSettingsStore } from '@/stores/settingsStore';
+import axiosInstance from '@/utils/axios';
+import { Toaster, toast } from 'sonner';
+
+import CategoryType from "./categoryType";
 
 
 interface FieldSettingsProps {
@@ -14,31 +20,62 @@ interface Field {
     description: string;
 }
 
-const getFieldSettings = async () => {
-    
-}
 
-const saveNewField = async () => {
-    
-}
 
 const FieldSettings: React.FC<FieldSettingsProps> = ({ fields }) => {
+
+    const {tableid} = useSettingsStore();
+
+    const [fieldid, setFieldid] = useState('');
+    const [fielddescription, setFielddescription] = useState('');
+    const [fieldtype, setFieldType] = useState('Parola');
+
+    const {containerMultiUse, setContainerMultiUse} = useSettingsStore();
+
+
+    const setCurrentFieldType = (fieldtype: string) => {
+        if (fieldtype === 'Categoria') {
+            setContainerMultiUse(<CategoryType />);
+        }
+        setFieldType(fieldtype);
+    }
+    
+
+
+    const getFieldSettings = async () => {
+        try {
+            const response = await axiosInstance.post('settings/save_new_table_field/', {tableid, fieldid, fielddescription, fieldtype});
+            toast.success('Campo salvato con successo');
+        } catch (error) {
+            console.error('Errore durante il salvataggio dell\'ordine delle tabelle', error);
+        }
+    }
+    
+    const saveNewField = async () => {
+        try {
+            const response = await axiosInstance.post('settings/save_new_table_field/', {tableid, fieldid, fielddescription, fieldtype});
+            toast.success('Campo salvato con successo');
+        } catch (error) {
+            console.error('Errore durante il salvataggio dell\'ordine delle tabelle', error);
+        }
+    }
+
     return (
         <div className="h-full">
             <div className="z-10 top-0 bg-white rounded-lg shadow-md transition-all duration-300 ease-out border border-gray-300 w-full cursor-default overflow-auto mx-auto p-2.5 mb-2 mt-2 flex w-full h-0.5/6">
                 <div className="w-5/6 p-1 flex">
                     <div className="w-2/6 p-1">
                         <label>ID</label>
-                        <input className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-bixcolor-light sm:text-sm/6"></input>
+                        <input className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-bixcolor-light sm:text-sm/6" onChange={(e) => setFieldid(e.target.value)}></input>
                     </div>
                     <div className="w-2/6 p-1">
                         <label>Descrizione</label>
-                        <input className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-bixcolor-light sm:text-sm/6"></input>
+                        <input className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-1 focus:ring-inset focus:ring-bixcolor-light sm:text-sm/6" onChange={(e) => setFielddescription(e.target.value)}></input>
                     </div>
                     <div className="w-2/6 p-1">
                         <label>Tipo</label> 
-                        <select id="field-type" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 :bg-gray-700">
-                            <option value="Parola">Parola</option>
+                        <select id="field-type" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 :bg-gray-700" onChange={(e) => setFieldType(e.target.value)}>
+                            <option selected value="Parola">Parola</option>
                             <option value="Numero">Numero</option>
                             <option value="Utente">Utente</option>
                             <option value="Linked">Linked</option>
