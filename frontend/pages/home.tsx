@@ -19,12 +19,24 @@ const SettingsPage = dynamic(() => import("@/pages/settings"), {
 
 const Home: React.FC<ResponseProps> = ({ response }) => {
     const [currentComponent, setCurrentComponent] = useState<string>('');
+    const [tableid, setTableid] = useState<string>('');
 
     // Funzione per cambiare il componente da caricare
-    const handleComponentChange = async (component: string) => {
+    const handleComponentChange = async (componentType: string, tableid: string) => {
+        setCurrentComponent('');
+        setTableid('');
         try {
             await axiosInstance.post('auth/test_request/');
-            setCurrentComponent(component);
+
+            {/*Soluzione temporanea per sviluppare tabelle e cards*/}
+            if (componentType === 'table') {
+                setCurrentComponent('TableCardManager');
+                setTableid(tableid);
+            } else {
+                setCurrentComponent('SettingsPage');
+            }
+            {/*Soluzione temporanea per sviluppare tabelle e cards*/}
+
         } catch (error) {
             console.error('Errore durante il logout', error);
         }
@@ -50,10 +62,10 @@ const Home: React.FC<ResponseProps> = ({ response }) => {
             <NavbarComp />
             <div className="w-full h-full flex">
                 <SidebarComp onChangeComponent={handleComponentChange} />
-                <div className=" relative w-full h-full bg-gray-100">
+                <div className="relative w-full h-full bg-gray-100">
                     <Suspense>
                         {currentComponent === 'SettingsPage' && <SettingsPage />}
-                        {currentComponent === 'TableCardManager' && <TableCardManager  />}
+                        {currentComponent === 'TableCardManager' && <TableCardManager tableid={tableid} />}
                     </Suspense>
                 </div>
             </div>

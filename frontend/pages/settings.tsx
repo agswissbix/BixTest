@@ -8,29 +8,40 @@ import axiosInstance from "@/utils/axios";
 import dynamic from "next/dynamic";
 import TableSettings from '@/components/settings/table/tableSettings';
 import FieldSettings from '@/components/settings/table/fieldSettings';
+import TestTablesList from '@/components/settings/table/testTableList';
+import { useSettingsStore } from '@/stores/settingsStore';
 
-const TablesList = dynamic(() => import("@/components/settings/table/tablesList"), {
-    suspense: true,
-    loading: () => <LoadingComp /> // Aggiungi questo
-});
     
 const SettingsPage: React.FC = () => {
 
     const [usersList, setUsersList] = useState([]);
-    const [selectedValue, setSelectedValue] = useState<string>("");
     const [workspacesTables, setworkspacesTables] = useState([]);
+    
+    const {setUserid, userid, resetUserid} = useSettingsStore();
+
+    const {tableSettings} = useSettingsStore(); 
+    const {resetTableSettings} = useSettingsStore();
+
+    const {fieldSettings} = useSettingsStore();
+    const {resetFieldSettings} = useSettingsStore();
 
     const handleUserChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedValue(e.target.value);
-        getWorkspacesTables();
+        const selectedUser = e.target.value;
+        try {
+            setUserid(selectedUser);
+            getWorkspacesTables(selectedUser); // Passa il valore direttamente
+        } catch (error) {
+            console.error('Errore durante il cambio utente', error);
+        }
     };
 
-    const getWorkspacesTables = async () => {
-        setworkspacesTables([]);
+    const getWorkspacesTables = async (userid : string) => {
         try {
-            const response = await axiosInstance.post('settings/get_workspaces_tables/', {user: selectedValue});
+            const response = await axiosInstance.post('settings/get_workspaces_tables/', {user: userid});
             setworkspacesTables(response.data.workspaces);
             console.info(response.data.workspaces);
+            resetTableSettings();
+            resetFieldSettings();
         } catch (error) {
             console.error('Errore durante il recupero della lista workspaces', error);
         }
@@ -44,11 +55,15 @@ const SettingsPage: React.FC = () => {
         } catch (error) {
             console.error('Errore durante il recupero della lista utenti', error);
         }
-    };
+    };  
 
     useEffect(() => {
+        resetUserid();
         getUsersList();
-        getWorkspacesTables();
+        return () => {
+            resetTableSettings();
+            resetFieldSettings();
+          };
     }, []);
 
     return (
@@ -57,18 +72,19 @@ const SettingsPage: React.FC = () => {
                 <Select
                     name="select-user"
                     options={usersList}
-                    value={selectedValue}
+                    value={userid}   
                     onChange={handleUserChange}
                 />
             </div>
             <div className="w-1/5 h-full p-2.5">
-                <TablesList workspaces={workspacesTables} />
+
+                <TestTablesList workspaces={workspacesTables} />
             </div>
             <div className="w-1/5 h-full p-2.5">
-                <TableSettings />
+                {tableSettings}
             </div>
             <div className="w-1/5 h-full p-2.5">
-                <FieldSettings />
+                {fieldSettings}
             </div>
             <div className="w-1/5 h-full p-2.5"></div>
         </div>
